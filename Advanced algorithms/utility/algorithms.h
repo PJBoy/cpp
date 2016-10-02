@@ -1,11 +1,11 @@
 #pragma once
 
 #include "typedefs.h"
+#include <bitset>
 
 
 constexpr bool powerOfTwo(unsigned v)
 {
-    // The '&& v' part is to stop 0 being classed as a power of two
     return (v & (v - 1)) == 0 && (v != 0);
 }
 
@@ -26,30 +26,35 @@ constexpr n_t numbits(signed v, n_t bits = 1)
     return v == 0 || v == -1 ? bits : numbits(v >> 1, bits + 1);
 }
 
+// To be replaced with std::max in C++14
 template<typename T>
 constexpr T max(T a, T b)
 {
     return a < b ? b : a;
 }
 
+// To be replaced with std::min in C++14
 template<typename T>
 constexpr T min(T a, T b)
 {
     return a < b ? a : b;
 }
 
+// To be replaced with std::size in C++17
 template<typename T, n_t n>
 constexpr n_t numof(T(&data)[n])
 {
     return n;
 }
 
+// To be replaced with std::max_element in C++17
 template<typename T, n_t n>
 constexpr T maxof(const T(&data)[n], index_t i = 0, T max = T())
 {
     return i < n ? maxof(data, i + 1, i == 0 ? data[0] : ::max(max, data[i])) : max;
 }
 
+// To be replaced with std::min_element in C++17
 template<typename T, n_t n>
 constexpr T minof(const T(&data)[n], index_t i = 0, T min = T())
 {
@@ -76,4 +81,9 @@ constexpr unsigned maxbitsof(const unsigned(&data)[n])
 constexpr unsigned pmod(signed x, unsigned n)
 {
     return (x % n + n) % n;
+}
+
+constexpr unsigned power(unsigned base, n_t exponent)
+{
+    return exponent == 0 ? 1 : power(base, exponent - 1) * base;
 }

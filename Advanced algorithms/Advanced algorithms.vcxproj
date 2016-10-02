@@ -91,7 +91,6 @@
     <ClCompile Include="data structures\static hash table.cpp" />
     <ClCompile Include="data structures\suffix array.cpp" />
     <ClCompile Include="data structures\van emde boas tree.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="stdlib examples.cpp" />
   </ItemGroup>
   <ItemGroup>

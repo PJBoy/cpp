@@ -140,4 +140,42 @@ namespace fun
     {
         return std::string(std::istreambuf_iterator<char>(std::ifstream(filepath)), {});
     }
+
+
+    // User defined literal _bits, constructs the minimum capacity bitset for an integer.
+    // E.g. 51_bits = std::bitset<6>(0b110011)
+    template<char S, char... XS>
+    struct CharsToInt
+        : public std::integral_constant<unsigned, (S - '0') * power(10, sizeof...(XS)) + CharsToInt<XS...>::value>
+    {};
+
+    template<char S>
+    struct CharsToInt<S>
+        : public std::integral_constant<unsigned, S - '0'>
+    {};
+
+    template<char... S>
+    constexpr unsigned charsToInt = CharsToInt<S...>::value;
+
+    template<char... S>
+    constexpr auto operator"" _bits() -> std::bitset<numbits(charsToInt<S...>)>
+    {
+        return charsToInt<S...>;
+    }
+}
+
+
+#include <iostream>
+
+namespace fun
+{
+    void f()
+    {
+        std::cout << 51_bits << '\n';
+    }
+}
+
+int main()
+{
+    fun::f();
 }
