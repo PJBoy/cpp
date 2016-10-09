@@ -163,19 +163,3 @@ namespace fun
         return charsToInt<S...>;
     }
 }
-
-
-#include <iostream>
-
-namespace fun
-{
-    void f()
-    {
-        std::cout << 51_bits << '\n';
-    }
-}
-
-int main()
-{
-    fun::f();
-}

@@ -1,11 +1,13 @@
 #include "../utility/utility.h"
 #include <bitset>
+#include <cstdio>
+#include <cstdlib>
 
 
 namespace wheel
 {
     template<typename T>
-    index_t binary_search_min(const T x[], n_t n, const T v)
+    index_t binarySearch_min(const T x[], n_t n, const T v)
     {
         index_t begin(0);
         while (n > 0)
@@ -25,10 +27,10 @@ namespace wheel
         return begin;
     }
     template<typename T, n_t n>
-    unsigned binary_search_min(const T(&x)[n], const T v){ return binary_search_min(x, n, v); }
+    unsigned binarySearch_min(const T(&x)[n], const T v){ return binary_search_min(x, n, v); }
 
     template<typename T>
-    index_t binary_search_max(const T x[], n_t n, const T v)
+    index_t binarySearch_max(const T x[], n_t n, const T v)
     {
         index_t begin(0);
         while (n > 0)
@@ -48,10 +50,10 @@ namespace wheel
         return begin;
     }
     template<typename T, n_t n>
-    unsigned binary_search_max(const T(&x)[n], const T v){ return binary_search_max(x, n, v); }
+    unsigned binarySearch_max(const T(&x)[n], const T v){ return binary_search_max(x, n, v); }
 
     template<typename T>
-    interval_t binary_search_interval(const T x[], n_t n, const T v)
+    interval_t binarySearch_interval(const T x[], n_t n, const T v)
     {
         interval_t interval{binary_search_min(x, n, v), binary_search_max(x, n, v)};
         if (!interval.second)
@@ -59,7 +61,7 @@ namespace wheel
         return interval;
     }
     template<typename T, n_t n>
-    interval_t binary_search_interval(const T(&x)[n], const T v){ return binary_search_interval(x, n, v); }
+    interval_t binarySearch_interval(const T(&x)[n], const T v){ return binary_search_interval(x, n, v); }
 
 
     unsigned exponentiate(unsigned base, std::bitset<numbits(numbits<unsigned>()-1)> exponent)
@@ -86,4 +88,32 @@ namespace wheel
 
         return ret;
     }
+
+
+    char* c_read_stdin()
+    {
+        const unsigned n_bufferChunk(8);
+        #define N_BUFFER_CHUNK "8"
+        
+        unsigned n_buffer(n_bufferChunk);
+        char* buffer((char*)(std::malloc(n_buffer + 1)));
+        *buffer = 0;
+        char newlineBuffer[2];
+        while (std::scanf("%" N_BUFFER_CHUNK "[^\n]%1[\n]", buffer + n_buffer - n_bufferChunk, newlineBuffer) == 1)
+        {
+            n_buffer += n_bufferChunk;
+            buffer = (char*)(std::realloc(buffer, n_buffer));
+        }
+
+        return buffer;
+    }
+}
+
+
+#include <iostream>
+
+int main()
+{
+    for (char* s(wheel::c_read_stdin()); *s; s = wheel::c_read_stdin())
+        std::cout << s << '\n';
 }
