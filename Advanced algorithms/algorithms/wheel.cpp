@@ -108,12 +108,3 @@ namespace wheel
         return buffer;
     }
 }
-
-
-#include <iostream>
-
-int main()
-{
-    for (char* s(wheel::c_read_stdin()); *s; s = wheel::c_read_stdin())
-        std::cout << s << '\n';
-}

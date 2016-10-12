@@ -1,8 +1,12 @@
 #include "../utility/utility.h"
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <functional>
 #include <limits>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 // Make a collect and disperse function (from a struct of arrays into an array of structs and vice versa) (zip and unzip)
 
@@ -125,4 +129,31 @@ std::string get_file_contents(const char* filepath)
     f.close();
 
     return contents;
+}
+
+
+template<n_t N, typename... T, index_t... index>
+auto zip_helper(std::tuple<std::array<T, N>...> arrays, std::index_sequence<index...>) -> std::array<std::tuple<T...>, N>
+{
+    std::array<std::tuple<T...>, N> ret;
+    for (index_t i(0); i < N; ++i)
+        ret[i] = std::make_tuple(std::get<index>(arrays)[i]...);
+
+    return ret;
+}
+
+template<n_t N, typename... T>
+auto zip(std::tuple<std::array<T, N>...> arrays) -> std::array<std::tuple<T...>, N>
+{
+    return zip_helper(arrays, std::index_sequence_for<T...>());
+}
+
+
+#include <iostream>
+
+int main()
+{
+    std::tuple<std::array<unsigned, 3>, std::array<double, 3>> t({1,2,3}, {4.4,5.5,6.6});
+    std::cout << t << '\n';
+    std::cout << zip(t) << '\n';
 }
