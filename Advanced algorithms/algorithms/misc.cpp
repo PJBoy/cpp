@@ -148,6 +148,7 @@ auto zip(std::tuple<std::array<T, N>...> arrays) -> std::array<std::tuple<T...>,
     return zip_helper(arrays, std::index_sequence_for<T...>());
 }
 
+#if 0
 
 #include <iostream>
 
@@ -157,3 +158,4 @@ int main()
     std::cout << t << '\n';
     std::cout << zip(t) << '\n';
 }
+#endif

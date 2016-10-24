@@ -137,6 +137,11 @@ void ll_iterator_example()
     for (int v : a)
         std::cout << v << '\n';
 
-    std::forward_list<int> fl(ll_iterator<int>(&a), {});
+    std::forward_list<int> fl(std::begin(a), std::end(a));
     std::cout << fl << '\n';
+}
+
+int main()
+{
+	ll_iterator_example();
 }
