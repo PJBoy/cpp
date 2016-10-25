@@ -8,8 +8,6 @@
 #include <type_traits>
 #include <utility>
 
-// Make a collect and disperse function (from a struct of arrays into an array of structs and vice versa) (zip and unzip)
-
 
 float sum_accurate(const float x[], n_t n)
 {
@@ -133,7 +131,7 @@ std::string get_file_contents(const char* filepath)
 
 
 template<n_t N, typename... T, index_t... index>
-auto zip_helper(std::tuple<std::array<T, N>...> arrays, std::index_sequence<index...>) -> std::array<std::tuple<T...>, N>
+auto zip_helper(const std::tuple<std::array<T, N>...>& arrays, std::index_sequence<index...>) -> std::array<std::tuple<T...>, N>
 {
     std::array<std::tuple<T...>, N> ret;
     for (index_t i(0); i < N; ++i)
@@ -143,12 +141,29 @@ auto zip_helper(std::tuple<std::array<T, N>...> arrays, std::index_sequence<inde
 }
 
 template<n_t N, typename... T>
-auto zip(std::tuple<std::array<T, N>...> arrays) -> std::array<std::tuple<T...>, N>
+auto zip(const std::tuple<std::array<T, N>...>& arrays) -> std::array<std::tuple<T...>, N>
 {
     return zip_helper(arrays, std::index_sequence_for<T...>());
 }
 
-#if 0
+
+template<n_t N, typename... T, index_t... index>
+auto unzip_helper(const std::array<std::tuple<T...>, N>& array, std::index_sequence<index...>) -> std::tuple<std::array<T, N>...>
+{
+	std::tuple<std::array<T, N>...> ret;
+	for (index_t i(0); i < N; ++i)
+		std::tie(std::get<index>(ret)[i]...) = std::tie(std::get<index>(array[i])...);
+
+	return ret;
+}
+
+template<n_t N, typename... T>
+auto unzip(const std::array<std::tuple<T...>, N>& array) -> std::tuple<std::array<T, N>...>
+{
+	return unzip_helper(array, std::index_sequence_for<T...>());
+}
+
+#if 1
 
 #include <iostream>
 
@@ -156,6 +171,8 @@ int main()
 {
     std::tuple<std::array<unsigned, 3>, std::array<double, 3>> t({1,2,3}, {4.4,5.5,6.6});
     std::cout << t << '\n';
-    std::cout << zip(t) << '\n';
+	std::array<std::tuple<unsigned, double>, 3> tt(zip(t));
+    std::cout << tt << '\n';
+	std::cout << unzip(tt) << '\n';
 }
 #endif

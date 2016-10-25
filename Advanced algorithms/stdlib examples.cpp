@@ -140,8 +140,3 @@ void ll_iterator_example()
     std::forward_list<int> fl(std::begin(a), std::end(a));
     std::cout << fl << '\n';
 }
-
-int main()
-{
-	ll_iterator_example();
-}
