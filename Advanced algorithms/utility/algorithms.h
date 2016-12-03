@@ -21,6 +21,11 @@ constexpr n_t numbits(unsigned v, n_t bits = 0)
     return v == 0 ? bits : numbits(v >> 1, bits + 1);
 }
 
+constexpr n_t numbits(index_t v, n_t bits = 0)
+{
+	return v == 0 ? bits : numbits(v >> 1, bits + 1);
+}
+
 constexpr n_t numbits(signed v, n_t bits = 1)
 {
     return v == 0 || v == -1 ? bits : numbits(v >> 1, bits + 1);

@@ -28,7 +28,7 @@ class StaticHashTable
 
             static std::default_random_engine UPRNG(std::random_device{}());
 
-            return std::uniform_int_distribution<unsigned>(0, std::size(data))(UPRNG);
+            return std::uniform_int_distribution<unsigned>(0, unsigned(std::size(data)))(UPRNG);
         }
 
         void nextHashParameters()
@@ -97,7 +97,7 @@ class StaticHashTable
         // The bind is useful when requesting many random numbers
 
         static std::default_random_engine UPRNG(std::random_device{}());
-        static std::uniform_int_distribution<unsigned> UID(0, n);
+        static std::uniform_int_distribution<unsigned> UID(0, unsigned(n));
 
         return UID(UPRNG);
     }

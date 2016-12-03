@@ -17,12 +17,12 @@ class VanEmdeBoasTree
     Array<VanEmdeBoasTree> data;
     Array<bool> summary;
 
-    index_t high(index_t k)
+    index_t high(index_t k) const
     {
         return k / n_datum;
     }
 
-    index_t low(index_t k)
+    index_t low(index_t k) const
     {
         return k % n_datum;
     }
@@ -37,7 +37,7 @@ public:
             return;
 
         n_t n_semiLogFloor(n_t(std::log2(n) / 2));
-        n_datum = 1 << n_semiLogFloor;
+        n_datum = n_t(1) << n_semiLogFloor;
         n_data = n_datum << 1;
 
         data = Array<VanEmdeBoasTree>(n_data);
@@ -66,7 +66,7 @@ public:
         }
     }
 
-    bool lookup(index_t k)
+    bool lookup(index_t k) const
     {
         if (n <= 2)
             return min == k || max == k;
@@ -103,17 +103,17 @@ public:
         }
     }
 
-    int minimum()
+    index_t minimum() const
     {
         return min;
     }
 
-    int maximum()
+	index_t maximum() const
     {
         return max;
     }
 
-    int predecessor(index_t k)
+    index_t predecessor(index_t k) const
     {
         if (k <= min)
             return -1;
@@ -127,7 +127,7 @@ public:
         for (index_t i(h + 1); i --> 0;)
             if (summary[i])
             {
-                const int p(data[i].predecessor(k));
+                const index_t p(data[i].predecessor(k));
                 if (p != -1)
                     return p;
             }
@@ -135,7 +135,7 @@ public:
         return min;
     }
 
-    int successor(index_t k)
+	index_t successor(index_t k) const
     {
         if (k >= max)
             return -1;
@@ -149,7 +149,7 @@ public:
         for (index_t i(h); i < n_data; ++i)
             if (summary[i])
             {
-                int p(data[i].successor(k));
+				index_t p(data[i].successor(k));
                 if (p != -1)
                     return p;
             }

@@ -3,6 +3,7 @@
 #include <string>
 
 
+template<typename T>
 class SuffixArray
 {
     // A custom radix sort that sorts keys such that their corresponding unsigned values are in ascending order, but with -1 as a special value that is the lowest
@@ -58,10 +59,10 @@ class SuffixArray
 public:
     // The data and corresponding array of indices into the data, sorted in lexicographical order of the associated suffices
     const n_t n;
-    Array<unsigned> data;
+    Array<T> data;
     Array<index_t> suffices;
 
-    SuffixArray(const Array<unsigned>& input)
+    SuffixArray(const Array<T>& input)
         : n(std::size(input))
     {
     /*
@@ -88,12 +89,12 @@ public:
         // Allocated space for data, padded up to a length a multiple of three
         const unsigned spill(n % 3);
         if (!spill)
-            data = Array<unsigned>(n); // No padding necessary
+            data = Array<T>(n); // No padding necessary
         else
         {
             // Padding necessary
             const n_t padding(3 - spill);
-            data = Array<unsigned>(n + padding);
+            data = Array<T>(n + padding);
             std::fill_n(std::begin(data) + n, padding, -1); // Pad with FF's
         }
 
