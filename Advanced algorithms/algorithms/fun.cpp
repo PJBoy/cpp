@@ -79,13 +79,13 @@ namespace fun
 
     unsigned and(unsigned x, unsigned y)
     {
-        constexpr unsigned n(numbits(decltype(x)(-1)));
+        constexpr n_t n(numbits<decltype(x)>());
 
         unsigned
             ret(0),
             multiplier(1);
 
-        for (unsigned i(n); i; --i)
+        for (index_t i(n); i; --i)
         {
             ret += x*y % 2 * multiplier;
             multiplier *= 2;
@@ -98,13 +98,13 @@ namespace fun
 
     unsigned or(unsigned x, unsigned y)
     {
-        constexpr unsigned n(numbits(decltype(x)(-1)));
+		constexpr n_t n(numbits<decltype(x)>());
 
         unsigned
             ret(0),
             multiplier(1);
 
-        for (unsigned i(n); i; --i)
+        for (index_t i(n); i; --i)
         {
             ret += (x + y - x*y) % 2 * multiplier;
             multiplier *= 2;
@@ -117,13 +117,13 @@ namespace fun
 
     unsigned xor(unsigned x, unsigned y)
     {
-        constexpr unsigned n(numbits(decltype(x)(-1)));
+		constexpr n_t n(numbits<decltype(x)>());
 
         unsigned
             ret(0),
             multiplier(1);
 
-        for (unsigned i(n); i; --i)
+        for (index_t i(n); i; --i)
         {
             ret += (x + y) % 2 * multiplier;
             multiplier *= 2;
