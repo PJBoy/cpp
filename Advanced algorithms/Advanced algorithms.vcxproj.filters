@@ -63,6 +63,9 @@
     <ClCompile Include="data structures\suffix array.cpp">
       <Filter>Source Files\Data Structures</Filter>
     </ClCompile>
+    <ClCompile Include="data structures\rabin-karp.cpp">
+      <Filter>Source Files\Data Structures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utility\data structures.h">
