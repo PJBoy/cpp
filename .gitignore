@@ -243,7 +243,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-/Advanced algorithms/cxx-prettyprint
-/cxx-prettyprint
-/cxx-prettyprint
 /cxx-prettyprint
