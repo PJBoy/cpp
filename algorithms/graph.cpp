@@ -97,6 +97,7 @@ public:
 };
 
 
+#if 0
 int main()
 {
 	Graph graph;
@@ -108,3 +109,4 @@ int main()
 	Dijkstra dijkstra(graph, 0);
 	std::cout << dijkstra.pathTo(3) << '\n';
 }
+#endif

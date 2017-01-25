@@ -121,7 +121,7 @@ std::string get_file_contents(const char* filepath)
 
     std::string contents;
     f.seekg(0, std::ios::end);
-    contents.resize(unsigned(f.tellg()));
+    contents.resize(std::size_t(f.tellg()));
     f.seekg(0, std::ios::beg);
     f.read(&contents[0], contents.size());
     f.close();
@@ -163,16 +163,82 @@ auto unzip(const std::array<std::tuple<T...>, N>& array) -> std::tuple<std::arra
 	return unzip_helper(array, std::index_sequence_for<T...>());
 }
 
-#if 0
 
+class Range
+{
+public:
+	class RangeIterator
+	{
+		const n_t step;
+		index_t i;
+
+	public:
+		RangeIterator(index_t i, n_t step)
+			: i(i), step(step)
+		{}
+
+		index_t operator*() const
+		{
+			return i;
+		}
+
+		void operator++()
+		{
+			i += step;
+		}
+
+		bool operator!=(const RangeIterator& rhs) const
+		{
+			return **this < *rhs;
+		}
+	};
+
+private:
+	const index_t i_begin{0}, i_end;
+	const n_t step{1};
+
+public:
+	Range(n_t i_end)
+		: i_end(i_end)
+	{}
+
+	Range(index_t i_begin, index_t i_end, n_t step = 1)
+		: i_begin(i_begin), i_end(i_end), step(step)
+	{}
+
+	RangeIterator begin() const
+	{
+		return {i_begin, step};
+	}
+
+	RangeIterator end() const
+	{
+		return {i_end, step};
+	}
+};
+
+
+#if 1
 #include <iostream>
+#include <string>
 
 int main()
 {
-    std::tuple<std::array<unsigned, 3>, std::array<double, 3>> t({1,2,3}, {4.4,5.5,6.6});
-    std::cout << t << '\n';
-	std::array<std::tuple<unsigned, double>, 3> tt(zip(t));
-    std::cout << tt << '\n';
-	std::cout << unzip(tt) << '\n';
+	auto printRange([](const auto&& object)
+	{
+		std::string separator;
+		for (index_t i : object)
+		{
+			std::cout << separator << i;
+			separator = ", ";
+		}
+	});
+
+	printRange(Range(5));
+	std::cout << '\n';
+	printRange(Range(2, 5));
+	std::cout << '\n';
+	printRange(Range(2, 5, 2));
+	std::cout << '\n';
 }
 #endif
