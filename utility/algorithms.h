@@ -3,6 +3,7 @@
 #include "typedefs.h"
 #include <algorithm>
 #include <bitset>
+#include <type_traits>
 
 
 constexpr bool powerOfTwo(unsigned v)
@@ -23,7 +24,8 @@ constexpr n_t numbits()
 }
 
 // Find the number of bits needed to contain v, i.e. ceil(log_2(v+1)) = floor(log_2(v)+1)
-constexpr n_t numbits(unsigned v)
+template<typename T, typename std::enable_if_t<std::is_unsigned_v<T>, T> = T()>
+constexpr n_t numbits(T v)
 {
 	n_t bits(0);
 	for (; v; v >>= 1)
@@ -32,16 +34,8 @@ constexpr n_t numbits(unsigned v)
 	return bits;
 }
 
-constexpr n_t numbits(index_t v)
-{
-	n_t bits(0);
-	for (; v; v >>= 1)
-		++bits;
-
-	return bits;
-}
-
-constexpr n_t numbits(signed v)
+template<typename T, typename std::enable_if_t<std::is_signed_v<T>, T> = T()>
+constexpr n_t numbits(T v)
 {
 	n_t bits(1); // For the sign bit
 	for (; v && v != -1; v >>= 1)

@@ -224,21 +224,7 @@ public:
 
 int main()
 {
-	auto printRange([](const auto&& object)
-	{
-		std::string separator;
-		for (index_t i : object)
-		{
-			std::cout << separator << i;
-			separator = ", ";
-		}
-	});
-
-	printRange(Range(5));
-	std::cout << '\n';
-	printRange(Range(2, 5));
-	std::cout << '\n';
-	printRange(Range(2, 5, 2));
-	std::cout << '\n';
+	std::cout << numbits(22u) << '\n';
+	std::cout << numbits(22) << '\n';
 }
 #endif
