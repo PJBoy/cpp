@@ -2,7 +2,9 @@
 #include <chrono>
 #include <forward_list>
 #include <iostream>
+#include <iterator>
 #include <random>
+#include <regex>
 
 
 // Examples for random number generation //
@@ -31,7 +33,7 @@ bool coin_flip()
 template<typename RandomIt>
 void shuffle(RandomIt begin, RandomIt end)
 {
-    shuffle(begin, end, std::default_random_engine(std::random_device{}()));
+    std::shuffle(begin, end, std::default_random_engine(std::random_device{}()));
 }
 
 
@@ -140,3 +142,53 @@ void ll_iterator_example()
     std::forward_list<int> fl(std::begin(a), std::end(a));
     std::cout << fl << '\n';
 }
+
+// Example of regular expressions //
+void regex()
+{
+	const std::regex pattern("defi(?:n(?:ate|[ae]n?t)|ant)ly", std::regex::icase | std::regex::optimize);
+	for (std::string line; std::getline(std::cin, line);)
+	{
+		{
+			if (std::regex_match(line, pattern))
+				std::cout << "That was a known mispelling of definitely\n";
+
+			std::smatch match;
+			if (std::regex_match(line, match, pattern))
+				std::cout << "That was a known mispelling of definitely. List of submatches:\n";
+
+			std::string separator;
+			for (const std::ssub_match& subMatch : match)
+				std::cout << '\t' << subMatch << '\n';
+
+			std::cout << "Match 0 is: " << match[0] << '\n';
+		}
+
+		{
+			if (std::regex_search(line, pattern))
+				std::cout << "That contained a known mispelling of definitely\n";
+
+			std::smatch match;
+			if (std::regex_search(line, match, pattern))
+				std::cout << "That contained a known mispelling of definitely. List of submatches:\n";
+
+			for (const std::ssub_match& subMatch : match)
+				std::cout << '\t' << subMatch << '\n';
+
+			std::cout << "Match 0 is: " << match[0] << '\n';
+		}
+
+		{
+			std::cout << "These are the known mispellings of definitely that occurred:\n";
+			for (std::sregex_iterator it_match(std::begin(line), std::end(line), pattern), it_match_end{}; it_match != it_match_end; ++it_match)
+				std::cout << '\t' << (*it_match)[0] << '\n';
+		}
+	}
+}
+
+#if 1
+int main()
+{
+	regex();
+}
+#endif
