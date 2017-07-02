@@ -117,4 +117,22 @@ namespace sort
     }
     template<n_t n_bits = numbits<signed>(), n_t n>
     void radix(index_t(&k)[n], signed(&v)[n]){ radix<n_bits>(k, v, n); }
+
+
+	// Counting sort //
+	template<n_t upperBound = 16>
+	void counting(index_t a[], n_t n)
+	{
+		const n_t n_counts = upperBound;
+
+		n_t counts[n_counts];
+		for (index_t i(0); i < n; ++i)
+			++counts[a[i]];
+		
+		auto it_a(std::begin(a));
+		for (index_t i(0); i < n_counts; ++i)
+			it_a = std::fill_n(it_a, counts[i], i);
+	}
+	template<n_t counts = 10, n_t n>
+	void counting(index_t(&a)[n]){ counting(a, n); }
 }
