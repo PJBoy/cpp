@@ -72,12 +72,12 @@ namespace fun
         return x;
     }
 
-    unsigned not(unsigned x)
+    unsigned not_(unsigned x)
     {
         return -1 - x;
     }
 
-    unsigned and(unsigned x, unsigned y)
+    unsigned and_(unsigned x, unsigned y)
     {
         constexpr n_t n(numbits<decltype(x)>());
 
@@ -96,7 +96,7 @@ namespace fun
         return ret;
     }
 
-    unsigned or(unsigned x, unsigned y)
+    unsigned or_(unsigned x, unsigned y)
     {
 		constexpr n_t n(numbits<decltype(x)>());
 
@@ -115,7 +115,7 @@ namespace fun
         return ret;
     }
 
-    unsigned xor(unsigned x, unsigned y)
+    unsigned xor_(unsigned x, unsigned y)
     {
 		constexpr n_t n(numbits<decltype(x)>());
 
@@ -136,10 +136,12 @@ namespace fun
 
 
     // One liner reading file contents into a string. It's an MSVS hack, as it uses an iterator over an rvalue
+    /*
     std::string get_file_contents(const char* filepath)
     {
         return std::string(std::istreambuf_iterator<char>(std::ifstream(filepath)), {});
     }
+    */
 
 
     // User defined literal _bits, constructs the minimum capacity bitset for an integer.

@@ -60,6 +60,8 @@ class ll_iterator;
 template<typename T>
 struct LL
 {
+    using iterator_t = ll_iterator<T>;
+
     LL* next;
     T data;
 
@@ -67,48 +69,67 @@ struct LL
         : next(next), data(data)
     {}
 
-    ll_iterator<T> begin()
+    iterator_t begin()
     {
-        return this;
+        return iterator_t(this);
     }
 
-    ll_iterator<T> end()
+    iterator_t end()
     {
-        return {};
+        return iterator_t();
     }
 };
 
 template<typename T>
-class ll_iterator : public std::iterator<std::input_iterator_tag, int>
+class ll_iterator
 {
 protected:
     LL<T>* p_ll;
 
 public:
-    ll_iterator(LL<T>* p_ll = nullptr)
+    // Iterator requires these typedefs exist (or iterator_traits is specialised equivalently)
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+
+    // InputIterator requires this is convertible to value_type
+    // ForwardIterator requires that this is precisely value_type& (but why?)
+    using reference = value_type&;
+
+    // ForwardIterator requires a default constructor
+    explicit ll_iterator(LL<T>* p_ll = nullptr)
         : p_ll(p_ll)
     {}
 
-    T& operator*()
+    // Iterator requires this exists
+    // InputIterator requires this returns reference
+    // InputIterator requires it_a == it_b implies *it_a is equivalent to *it_b
+    // InputIterator requires (void)*it, *it is equivalent to *it
+    // OutputIterator requires this returns an assignable type
+    reference operator*()
     {
         return p_ll->data;
     }
 
-    const T& operator*() const
+    const reference operator*() const
     {
         return p_ll->data;
     }
 
+    // InputIterator requires this exists and it->m is equivalent to (*it).m
     T* operator->()
     {
-        return &p_ll->data;
+        return &**this;
     }
 
     const T* operator->() const
     {
-        return &p_ll->data;
+        return &**this;
     }
 
+    // Iterator requires this exists and to return an ll_iterator&
+    // ForwardIterator requires that (void)++ll_iterator(it), *it is equivalent to *it
     ll_iterator& operator++()
     {
         p_ll = p_ll->next;
@@ -116,16 +137,27 @@ public:
         return *this;
     }
 
+    // InputIterator and OutputIterator require this exists
+    // InputIterator requires this to return a type whose operator* returns a type convertible to value_type
+    // InputIterator and OutputIterator require this is equivalent to the following
+    // OutputIterator requires this to return a type convertible to const ll_iterator&
+    // OutputIterator requires this to return an assignable type such that *it++ = v is equivalent to *r = v; ++it;
+    // ForwardIterator requires this to return an ll_iterator
+    // ForwardIterator requires this to return a type whose operator* returns reference
     ll_iterator operator++(int)
     {
         return std::exchange(*this, ++*this);
     }
 
+    // Iterator requires this exists, is an equivalence relation and returns a type contextually convertible to bool
+    // ForwardIterator requires that it_a == it_b implies *it_a and *it_b refer to the same object or are both not dereferenceable
+    // ForwardIterator requires that it_a == it_b implies ++it_a == ++it_b
     bool operator==(const ll_iterator& rhs) const
     {
         return p_ll == rhs.p_ll;
     }
 
+    // InputIterator requires this exists and is equivalent to the following
     bool operator!=(const ll_iterator& rhs) const
     {
         return !(*this == rhs);
@@ -223,6 +255,6 @@ void regex()
 #if 1
 int main()
 {
-	regex();
+    ll_iterator_example();
 }
 #endif
