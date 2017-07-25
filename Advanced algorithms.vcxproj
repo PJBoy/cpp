@@ -148,7 +148,11 @@
     <ClCompile Include="data structures\static hash table.cpp" />
     <ClCompile Include="data structures\suffix array.cpp" />
     <ClCompile Include="data structures\van emde boas tree.cpp" />
-    <ClCompile Include="stdlib examples.cpp" />
+    <ClCompile Include="stdlib examples\allocator.cpp" />
+    <ClCompile Include="stdlib examples\iterator.cpp" />
+    <ClCompile Include="stdlib examples\misc.cpp" />
+    <ClCompile Include="stdlib examples\random.cpp" />
+    <ClCompile Include="stdlib examples\regex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utility\algorithms.h" />

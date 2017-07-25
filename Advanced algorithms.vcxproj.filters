@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdlib examples.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="algorithms\fun.cpp">
       <Filter>Source Files\algorithms</Filter>
     </ClCompile>
@@ -65,6 +62,21 @@
     </ClCompile>
     <ClCompile Include="data structures\misc.cpp">
       <Filter>Source Files\data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\regex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\iterator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\allocator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

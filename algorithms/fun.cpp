@@ -1,5 +1,5 @@
 #include "../utility/utility.h"
-#include <fstream>
+#include <iostream>
 
 namespace fun
 {
@@ -8,11 +8,11 @@ namespace fun
     {
         for (index_t r(0); r < n; ++r)
             for (index_t l(0); l < r; ++l)
-              if (a[r] < a[l])
-                  std::swap(a[r], a[l]);
+                if (a[r] < a[l])
+                    std::swap(a[r], a[l]);
     }
     template<n_t N>
-    void leftPartition(int(&a)[N]){ leftPartition(a, N); }
+    void leftPartition(int(&a)[N]) { leftPartition(a, N); }
 
     void rightPartition(int a[], n_t n)
     {
@@ -22,7 +22,7 @@ namespace fun
                     std::swap(a[l], a[r]);
     }
     template<n_t N>
-    void rightPartition(int(&a)[N]){ rightPartition(a, N); }
+    void rightPartition(int(&a)[N]) { rightPartition(a, N); }
 
 
     // The simplest formula for pi
@@ -98,7 +98,7 @@ namespace fun
 
     unsigned or_(unsigned x, unsigned y)
     {
-		constexpr n_t n(numbits<decltype(x)>());
+        constexpr n_t n(numbits<decltype(x)>());
 
         unsigned
             ret(0),
@@ -117,7 +117,7 @@ namespace fun
 
     unsigned xor_(unsigned x, unsigned y)
     {
-		constexpr n_t n(numbits<decltype(x)>());
+        constexpr n_t n(numbits<decltype(x)>());
 
         unsigned
             ret(0),
@@ -146,6 +146,27 @@ namespace fun
 
     // User defined literal _bits, constructs the minimum capacity bitset for an integer.
     // E.g. 51_bits = std::bitset<6>(0b110011)
+    // Not sure which of the below I like more...
+
+#if MSVS_supports_fold_expressions
+    template<char... S, index_t... N>
+    constexpr unsigned charsToInt_helper(std::index_sequence<N...>)
+    {
+        return (((S - '0') * power(10, sizeof...(N)-1 - N)) + ...);
+    }
+
+    template<char... S>
+    constexpr unsigned charsToInt()
+    {
+        return charsToInt_helper<S...>(std::make_index_sequence<sizeof...(S)>());
+    }
+
+    template<char... S>
+    constexpr auto operator"" _bits() -> std::bitset<numbits(CharsToInt<S...>::value)>
+    {
+        return charsToInt<S...>();
+    }
+#else
     template<char S, char... XS>
     struct CharsToInt
         : public std::integral_constant<unsigned, (S - '0') * power(10, sizeof...(XS)) + CharsToInt<XS...>::value>
@@ -157,11 +178,21 @@ namespace fun
     {};
 
     template<char... S>
-    constexpr unsigned charsToInt = CharsToInt<S...>::value;
-
-    template<char... S>
-    constexpr auto operator"" _bits() -> std::bitset<numbits(charsToInt<S...>)>
+    constexpr auto operator"" _bits() -> std::bitset<numbits(CharsToInt<S...>::value)>
     {
-        return charsToInt<S...>;
+        return CharsToInt<S...>::value;
+    }
+#endif
+
+    void bitsExample()
+    {
+        std::cout << 51_bits << '\n';
     }
 }
+
+#if 0
+int main()
+{
+    fun::bitsExample();
+}
+#endif

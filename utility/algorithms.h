@@ -6,7 +6,7 @@
 #include <type_traits>
 
 
-constexpr bool powerOfTwo(unsigned v)
+constexpr bool powerOfTwo(unsigned long long v)
 {
 	if ((v & v - 1) != 0)
 		return false;
@@ -24,7 +24,7 @@ constexpr n_t numbits()
 }
 
 // Find the number of bits needed to contain v, i.e. ceil(log_2(v+1)) = floor(log_2(v)+1)
-template<typename T, typename std::enable_if_t<std::is_unsigned_v<T>, T> = T()>
+template<typename T, typename std::enable_if_t<std::is_unsigned_v<T>, int> = 0>
 constexpr n_t numbits(T v)
 {
 	n_t bits(0);
@@ -34,7 +34,7 @@ constexpr n_t numbits(T v)
 	return bits;
 }
 
-template<typename T, typename std::enable_if_t<std::is_signed_v<T>, T> = T()>
+template<typename T, typename std::enable_if_t<std::is_signed_v<T>, int> = 0>
 constexpr n_t numbits(T v)
 {
 	n_t bits(1); // For the sign bit
@@ -66,11 +66,11 @@ constexpr unsigned pmod(signed x, unsigned n)
     return (x % n + n) % n;
 }
 
-constexpr unsigned power(unsigned base, n_t exponent)
+constexpr unsigned long long power(unsigned long long base, n_t exponent)
 {
-	unsigned ret(1);
+	unsigned long long ret(1);
 
-	for (; exponent; --exponent)
+	while (exponent --> 0)
 		ret *= base;
 
 	return ret;
