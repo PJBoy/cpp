@@ -218,13 +218,78 @@ public:
 };
 
 
-#if 0
+// Take forward iterators and demonstrate a double buffering example :)
+void prepend(int* data, n_t n_data, const int header[], n_t n_header)
+{
+/*
+    Read block 0 (as it will be overwritten by header)
+    Overwrite block 0 with header
+    Read block 1 (as it will be overwritten by block 0)
+    Overwrite block 1 with block 0
+
+    Read block i+1 (as it will be overwritten by block i)
+    Overwrite block i+1 with block i
+*/
+
+    const int* data_in(data);
+    int* data_out(data);
+
+    const n_t n_buffer(10);
+    int buffers[2][n_buffer];
+    index_t i_buffers(0);
+
+    const auto read([&](n_t n)
+    {
+    /*
+        int(&buffer)[n_buffer](buffers[i_buffers]);
+        std::copy(data_in, data_in + n, std::begin(buffer));
+    /*/
+        std::copy(data_in, data_in + n, std::begin(buffers[i_buffers]));
+    //*/
+        data_in += n;
+    });
+    const auto write([&](n_t n)
+    {
+    /*
+        const int(&buffer)[n_buffer](buffers[i_buffers ^ 1]);
+        std::copy(std::begin(buffer), std::begin(buffer) + n, data_out);
+    /*/
+        std::copy(std::begin(buffers[i_buffers ^ 1]), std::begin(buffers[i_buffers ^ 1]) + n, data_out);
+    //*/
+        data_out += n;
+    });
+
+    read(n_buffer);
+    std::copy(header, header + n_header, data_out);
+    data_out += n_header;
+    i_buffers ^= 1;
+
+    for (index_t i_block(0); i_block < n_data / n_buffer - 1; ++i_block)
+    {
+        read(n_buffer);
+        write(n_buffer);
+        i_buffers ^= 1;
+    }
+
+    read(n_data % n_buffer);
+    write(n_buffer);
+    i_buffers ^= 1;
+    write(n_data % n_buffer);
+}
+
+
+#if 1
 #include <iostream>
-#include <string>
+#include <numeric>
 
 int main()
 {
-	std::cout << numbits(22u) << '\n';
-	std::cout << numbits(22) << '\n';
+	int data[33];
+	std::iota(std::begin(data), std::end(data), 0);
+    int header[7];
+    std::iota(std::begin(header), std::end(header), 100);
+
+    prepend(data, std::size(data) - std::size(header), header, std::size(header));
+    std::cout << data << '\n';
 }
 #endif
