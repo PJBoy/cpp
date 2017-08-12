@@ -80,6 +80,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -99,6 +101,8 @@
       <OpenMPSupport>true</OpenMPSupport>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -115,6 +119,9 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <WarningLevel>Level3</WarningLevel>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +135,9 @@
       <OpenMPSupport>true</OpenMPSupport>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <WarningLevel>Level3</WarningLevel>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -1,12 +1,38 @@
 #include "../utility/utility.h"
 #include <ios>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
-template<typename T>
-class DebugAllocator
+struct Indexer
 {
+    static n_t nextId, objectsAlive;
+};
+
+n_t Indexer::nextId, Indexer::objectsAlive;
+
+template<typename T>
+class DebugAllocator : protected Indexer
+{
+    static std::string formatPointer(const void* p)
+    {
+        std::ostringstream s;
+        s << "[93m0x" << std::hex << std::uppercase << uintptr_t(p) << "[0m";
+        return s.str();
+    }
+
+    static std::string formatFunctionName(std::string_view functionName)
+    {
+        return "[96m" + std::string(functionName) + "[0m";
+    }
+
+    static std::string indentation()
+    {
+        constexpr n_t indentationSize(4);
+        return std::string(objectsAlive * indentationSize, ' ');
+    }
+
 public:
     // Allocator requires this exists
     using value_type = T;
@@ -14,45 +40,98 @@ public:
     using pointer = value_type*;
     using size_type = std::make_unsigned_t<typename std::pointer_traits<pointer>::difference_type>;
 
+    index_t id;
+
     DebugAllocator() noexcept
+        : id(nextId++)
     {
-        std::clog << "DebugAllocator::DebugAllocator(0x" << std::hex << this << ")\n";
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+        ++objectsAlive;
     }
 
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
+    DebugAllocator(const DebugAllocator& rhs) noexcept
+        : id(nextId++)
+    {
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        ++objectsAlive;
+    }
+
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
+    DebugAllocator(DebugAllocator&& rhs) noexcept
+        : id(nextId++)
+    {
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
+        ++objectsAlive;
+    }
+
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
     template<typename T_rhs>
     DebugAllocator(const DebugAllocator<T_rhs>& rhs) noexcept
+        : id(nextId++)
     {
-        std::clog << "DebugAllocator::DebugAllocator(0x" << std::hex << this << ", 0x" << &rhs << ")\n";
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        ++objectsAlive;
     }
 
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
     template<typename T_rhs>
     DebugAllocator(DebugAllocator<T_rhs>&& rhs) noexcept
+        : id(nextId++)
     {
-        std::clog << "DebugAllocator::DebugAllocator(0x" << std::hex << this << ", move(0x" << &rhs << "))\n";
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
+        ++objectsAlive;
     }
 
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
     template<typename T_rhs>
     DebugAllocator& operator=(const DebugAllocator<T_rhs>& rhs) noexcept
     {
-        std::clog << std::hex << this << " = DebugAllocator::operator=(0x" << this << ", 0x" << &rhs << ")\n";
+        std::cerr << indentation() << id << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
     }
 
+    // Allocator requires this to construct that object that can deallocate rhs' allocations
+    // Allocator requires this to not throw
     template<typename T_rhs>
-    DebugAllocator& operator=(const DebugAllocator<T_rhs>&& rhs) noexcept
+    DebugAllocator& operator=(DebugAllocator<T_rhs>&& rhs) noexcept
     {
-        std::clog << std::hex << this << " = DebugAllocator::operator=(0x" << this << ", move(0x" << &rhs << "))\n";
+        std::cerr << indentation() << id << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
     }
 
     ~DebugAllocator() noexcept
     {
-        std::clog << "DebugAllocator::~DebugAllocator(0x" << std::hex << this << ")\n";
+        --objectsAlive;
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+    }
+
+    // Allocator requires this to be true only if rhs can deallocate memory provided by *this
+    // Allocator requires this to be an equivalence relation.
+    // Allocator requires this to not throw
+    template<typename T_rhs>
+    bool operator==(const DebugAllocator<T_rhs>& rhs) const noexcept
+    {
+        std::cerr << indentation() << std::boolalpha << true << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        return true;
+    }
+
+    // Allocator requires this to return !(*this == rhs)
+    template<typename T_rhs>
+    bool operator!=(const DebugAllocator<T_rhs>& rhs) const noexcept
+    {
+        std::cerr << indentation() << std::boolalpha << false << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        return false;
     }
 
     // Allocator requires this to allocate memory for n objects of value_type, but to not construct them
     pointer allocate(size_type n) const
     {
         value_type* const p((value_type*) new char[sizeof(value_type) * n]);
-        std::clog << std::hex << p << " = DebugAllocator::allocate(0x" << this << ", " << std::dec << sizeof(value_type) * n << ")\n";
+        std::cerr << indentation() << formatPointer(p) << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << n << ")\n";
         return p;
     }
 
@@ -60,26 +139,31 @@ public:
     // Allocator requires this to not throw
     void deallocate(pointer p, size_type n) const noexcept
     {
-        std::clog << "DebugAllocator::deallocate(0x" << std::hex << this << ", 0x" << p << ", " << std::dec << sizeof(value_type) * n << ")\n";
-        delete[] (value_type*) p;
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << formatPointer(p) << ", " << n << ")\n";
+        delete[](value_type*) p;
     }
 
-    // Allocator requires this to be true only if rhs can deallocate memory provided by *this
-    // Allocator requires this to be an equivalence relation.
-    // Allocator requires this to not throw
-    bool operator==(const DebugAllocator& rhs) const noexcept
+    DebugAllocator select_on_container_copy_construction() const noexcept
     {
-        std::clog << std::boolalpha << true << " = DebugAllocator::operator==(" << std::hex << this << ", 0x" << &rhs << ")\n";
-        return true;
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+        return {};
     }
 
-    // Allocator requires the following
-    bool operator!=(const DebugAllocator& rhs) const noexcept
+    template<typename T_rhs>
+    void swap(DebugAllocator<T_rhs>& rhs) noexcept
     {
-        std::clog << std::boolalpha << true << " = DebugAllocator::operator!=(" << std::hex << this << ", 0x" << &rhs << ")\n";
-        return false;
+        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
     }
 };
+
+namespace std
+{
+    template<typename T_lhs, typename T_rhs>
+    void swap(DebugAllocator<T_lhs>& lhs, DebugAllocator<T_rhs>& rhs) noexcept
+    {
+        lhs.swap(rhs);
+    }
+}
 
 #if 1
 int main()
@@ -99,5 +183,11 @@ int main()
     }
 
     std::cout << '\n';
+
+    decltype(v) v_copy(v);
+    std::cout << "Copied\n";
+
+    std::swap(v, v_copy);
+    std::cout << "Swapped\n";
 }
 #endif

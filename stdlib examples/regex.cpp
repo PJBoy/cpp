@@ -14,6 +14,7 @@ void regex()
         std::string line;
         std::getline(std::cin, line);
 
+        // std::regex_match
         try
         {
             if (std::regex_match(line, pattern))
@@ -31,9 +32,10 @@ void regex()
         }
         catch (const std::regex_error& e)
         {
-            std::cerr << "Regex error in match example\n";
+            std::cerr << "Regex error in match example: " << e.what() << '\n';
         }
 
+        // std::regex_search
         try
         {
             if (std::regex_search(line, pattern))
@@ -50,9 +52,10 @@ void regex()
         }
         catch (const std::regex_error& e)
         {
-            std::cerr << "Regex error in search example\n";
+            std::cerr << "Regex error in search example: " << e.what() << '\n';
         }
 
+        // std::sregex_iterator
         try
         {
             std::cout << "These are the known mispellings of definitely that occurred:\n";
@@ -61,9 +64,10 @@ void regex()
         }
         catch (const std::regex_error& e)
         {
-            std::cerr << "Regex error in regex_iterator example\n";
+            std::cerr << "Regex error in regex_iterator example: " << e.what() << '\n';
         }
 
+        // std::regex_replace
         try
         {
             std::cout << "Here is the correct version:\n";
@@ -76,7 +80,7 @@ void regex()
         }
         catch (const std::regex_error& e)
         {
-            std::cerr << "Regex error in replace example\n";
+            std::cerr << "Regex error in replace example: " << e.what() << '\n';
         }
     }
 }

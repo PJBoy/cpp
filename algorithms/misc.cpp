@@ -115,16 +115,14 @@ OutputIt iota_n(OutputIt first, Size count, T value)
 
 std::string get_file_contents(const char* filepath)
 {
-    std::ifstream f(filepath, std::ios::in | std::ios::binary);
-    if (!f)
-        throw errno;
-
     std::string contents;
+
+    std::ifstream f(filepath, std::ios::in | std::ios::binary);
+    f.exceptions(std::ios::badbit | std::ios::failbit);
     f.seekg(0, std::ios::end);
-    contents.resize(std::size_t(f.tellg()));
+    contents.resize(f.tellg());
     f.seekg(0, std::ios::beg);
-    f.read(&contents[0], contents.size());
-    f.close();
+    f.read(std::data(contents), std::size(contents));
 
     return contents;
 }
@@ -278,7 +276,7 @@ void prepend(int* data, n_t n_data, const int header[], n_t n_header)
 }
 
 
-#if 1
+#if 0
 #include <iostream>
 #include <numeric>
 
