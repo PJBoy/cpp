@@ -148,7 +148,7 @@ namespace fun
     // E.g. 51_bits = std::bitset<6>(0b110011)
     // Not sure which of the below I like more...
 
-#if MSVS_supports_fold_expressions
+#if __cpp_fold_expressions
     template<char... S, index_t... N>
     constexpr unsigned charsToInt_helper(std::index_sequence<N...>)
     {
