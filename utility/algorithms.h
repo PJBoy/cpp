@@ -75,3 +75,15 @@ constexpr unsigned long long power(unsigned long long base, n_t exponent)
 
 	return ret;
 }
+
+template<typename Tag, typename It>
+constexpr bool is_iterator_v
+{
+    std::is_same_v<Tag, std::output_iterator_tag>
+    ?
+        std::is_same_v<std::iterator_traits<It>::iterator_category, std::output_iterator_tag>
+        ||
+            std::is_base_of_v<std::forward_iterator_tag, std::iterator_traits<It>::iterator_category>
+            && !std::is_const_v<std::remove_reference_t<std::iterator_traits<It>::reference>>
+    : std::is_base_of_v<Tag, std::iterator_traits<It>::iterator_category>
+};

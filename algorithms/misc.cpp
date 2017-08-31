@@ -113,6 +113,19 @@ OutputIt iota_n(OutputIt first, Size count, T value)
 }
 
 
+template<typename InputIt, typename Size, typename OutputIt>
+OutputIt move_n(InputIt in, Size n, OutputIt out)
+{
+    static_assert(is_iterator_v<std::input_iterator_tag, InputIt>, "Input iterator is not an InputIterator");
+    static_assert(is_iterator_v<std::output_iterator_tag, OutputIt>, "Output iterator is not an OutputIterator");
+
+    while (n--)
+        *out++ = std::move(*in++);
+
+    return out;
+}
+
+
 std::string get_file_contents(const char* filepath)
 {
     std::ifstream f(filepath, std::ios::in | std::ios::binary);
@@ -218,8 +231,8 @@ public:
 };
 
 
-// Take forward iterators and demonstrate a double buffering example :)
-void prepend(int* data, n_t n_data, const int header[], n_t n_header)
+// Going to make this work on forward iterator
+void prepend(int* data, n_t n_data, const int* header, n_t n_header)
 {
 /*
     Read block 0 (as it will be overwritten by header)
@@ -237,44 +250,45 @@ void prepend(int* data, n_t n_data, const int header[], n_t n_header)
     const n_t n_buffer(10);
     int buffers[2][n_buffer];
     index_t i_buffers(0);
+    int* buffer_to(std::begin(buffers[i_buffers]));
+    const int* buffer_from(std::begin(buffers[i_buffers ^ 1]));
 
-    const auto read([&](n_t n)
+    const auto move([](const int*& from, n_t n, int*& to)
     {
-    /*
-        int(&buffer)[n_buffer](buffers[i_buffers]);
-        std::copy(data_in, data_in + n, std::begin(buffer));
-    /*/
-        std::copy(data_in, data_in + n, std::begin(buffers[i_buffers]));
-    //*/
-        data_in += n;
+        while (n --> 0)
+            *to++ = *from++;
     });
-    const auto write([&](n_t n)
+    const auto read([&](int* to, n_t n)
     {
-    /*
-        const int(&buffer)[n_buffer](buffers[i_buffers ^ 1]);
-        std::copy(std::begin(buffer), std::begin(buffer) + n, data_out);
-    /*/
-        std::copy(std::begin(buffers[i_buffers ^ 1]), std::begin(buffers[i_buffers ^ 1]) + n, data_out);
-    //*/
-        data_out += n;
+        move(data_in, n, to);
     });
-
-    read(n_buffer);
-    std::copy(header, header + n_header, data_out);
-    data_out += n_header;
-    i_buffers ^= 1;
-
-    for (index_t i_block(0); i_block < n_data / n_buffer - 1; ++i_block)
+    const auto write([&](const int* from, n_t n)
     {
-        read(n_buffer);
-        write(n_buffer);
+        move(from, n, data_out);
+    });
+    const auto swapBuffers([&]()
+    {
         i_buffers ^= 1;
+        buffer_to = std::begin(buffers[i_buffers]);
+        buffer_from = std::begin(buffers[i_buffers ^ 1]);
+    });
+
+    read(buffer_to, n_buffer);
+    write(header, n_header);
+    swapBuffers();
+
+    for (index_t i(n_data / n_buffer - 1); i --> 0;)
+    {
+        read(buffer_to, n_buffer);
+        write(buffer_from, n_buffer);
+        swapBuffers();
     }
 
-    read(n_data % n_buffer);
-    write(n_buffer);
-    i_buffers ^= 1;
-    write(n_data % n_buffer);
+    read(buffer_to, n_data % n_buffer);
+    write(buffer_from, n_buffer);
+    swapBuffers();
+
+    write(buffer_from, n_data % n_buffer);
 }
 
 
