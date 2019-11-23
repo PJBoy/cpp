@@ -3,48 +3,59 @@
 #include <forward_list>
 
 
+template<typename T>
 class HashTable
 {
-    using Bucket = std::forward_list<KV>;
+    using Bucket = std::forward_list<KV<index_t, T>>;
     
-    static const n_t n{256};
+    static const n_t n_data{256};
 
-    Bucket data[n];
+    Bucket data[n_data];
 
-    Bucket& getBucket(int k)
+    index_t hash(index_t k_hash) const
     {
-        return data[hash(k)];
+        return k_hash % n_data;
     }
 
-    const Bucket& getBucket(int k) const
+    static Bucket::iterator find_before(Bucket& bucket, index_t value)
     {
-        return data[hash(k)];
-    }
+        if (std::begin(bucket) == std::end(bucket))
+            return std::end(bucket);
 
-    index_t hash(int k) const
-    {
-        return k % n;
+        if (*std::begin(bucket) == value)
+            return bucket.before_begin();
+
+        return std::adjacent_find(std::begin(bucket), std::end(bucket), [&](auto const&, auto const& rhs)
+        {
+            return rhs == value;
+        });
     }
 
 public:
-    void add(int k, int v)
+    template<typename TT>
+    void add(TT&& v)
     {
-        getBucket(k).emplace_front(k, v);
+        const index_t v_hash(hash(std::hash<T>(v)()));
+
+        data[v_hash].emplace_front(k, std::forward<TT>(v));
     }
 
-    int lookup(int k) const
+    bool lookup(const T& v) const
     {
-        const Bucket& bucket(getBucket(k));
-        auto entry(std::find(std::cbegin(bucket), std::cend(bucket), k));
-        if (entry == std::cend(bucket))
-            throw std::domain_error("HashTable::lookup: key not found");
+        const index_t v_hash(hash(std::hash<T>(v)()));
 
-        return entry->v;
+        const Bucket& bucket(data[v_hash]);
+        auto it(std::find(std::begin(bucket), std::end(bucket), v_hash));
+        return it != std::end(bucket);
     }
 
-    void remove(int k)
+    void remove(const T& v)
     {
-        Bucket& bucket(getBucket(k));
-        std::remove(std::begin(bucket), std::end(bucket), k);
+        const index_t v_hash(hash(std::hash<T>(v)()));
+
+        const Bucket& bucket(data[v_hash]);
+        auto it(find_before(bucket, v_hash));
+        if (it != std::end(bucket))
+            bucket.erase_after(it);
     }
 };

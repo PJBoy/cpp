@@ -38,7 +38,7 @@ class StaticHashTable
         }
 
     public:
-        Subtable(const Array<KV>& KVs)
+        Subtable(const Array<KV<int, int>>& KVs)
         {
             const n_t n(std::size(KVs));
 
@@ -49,7 +49,7 @@ class StaticHashTable
             reconstruct:
             {
                 std::fill(std::begin(used), std::end(used), false);
-                for (const KV& kv : KVs)
+                for (const KV<int, int>& kv : KVs)
                 {
                     // If found a collision, try again
                     if (used[hash(kv.k)])
@@ -63,7 +63,7 @@ class StaticHashTable
             }
 
             // Found hash function, add all the values to the hash table
-            for (const KV& kv : KVs)
+            for (const KV<int, int>& kv : KVs)
                 data[hash(kv.k)] = kv.v;
         }
 
@@ -109,7 +109,7 @@ class StaticHashTable
     }
     
 public:
-    StaticHashTable(Array<KV> KVs)
+    StaticHashTable(Array<KV<int, int>> KVs)
         : n(std::size(KVs))
     {
         // Array of number of collisions from keys
@@ -122,7 +122,7 @@ public:
             std::fill(std::begin(hashCounts), std::end(hashCounts), 0);
 
             n_t collisions(0);
-            for (const KV& kv : KVs)
+            for (const KV<int, int>& kv : KVs)
             {
                 n_t& hashCount(hashCounts[hash(kv.k)]);
                 ++hashCount;
@@ -142,11 +142,11 @@ public:
         }
 
         // Add data to respective subtables
-        Array<Array<KV>> table(n);
+        Array<Array<KV<int, int>>> table(n);
         for (index_t i(0); i < n; ++i)
-            table[i] = Array<KV>(hashCounts[i]);
+            table[i] = Array<KV<int, int>>(hashCounts[i]);
 
-        for (const KV& kv : KVs)
+        for (const KV<int, int>& kv : KVs)
             table[hash(kv.k)].push_back({kv.k, kv.v});
 
         for (index_t i(0); i < n; ++i)

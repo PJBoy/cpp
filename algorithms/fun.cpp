@@ -1,4 +1,5 @@
 #include "../utility/utility.h"
+#include <fstream>
 #include <iostream>
 
 namespace fun
@@ -6,8 +7,8 @@ namespace fun
     // The simplest sorting algorithms
     void leftPartition(int a[], n_t n)
     {
-        for (index_t r(0); r < n; ++r)
-            for (index_t l(0); l < r; ++l)
+        for (index_t r{}; r < n; ++r)
+            for (index_t l{}; l < r; ++l)
                 if (a[r] < a[l])
                     std::swap(a[r], a[l]);
     }
@@ -16,7 +17,7 @@ namespace fun
 
     void rightPartition(int a[], n_t n)
     {
-        for (index_t l(0); l < n; ++l)
+        for (index_t l{}; l < n; ++l)
             for (index_t r(l); r < n; ++r)
                 if (a[r] < a[l])
                     std::swap(a[l], a[r]);
@@ -79,7 +80,7 @@ namespace fun
 
     unsigned and_(unsigned x, unsigned y)
     {
-        constexpr n_t n(numbits<decltype(x)>());
+        constexpr n_t n(bitSize_v<decltype(x)>);
 
         unsigned
             ret(0),
@@ -98,7 +99,7 @@ namespace fun
 
     unsigned or_(unsigned x, unsigned y)
     {
-        constexpr n_t n(numbits<decltype(x)>());
+        constexpr n_t n(bitSize_v<decltype(x)>);
 
         unsigned
             ret(0),
@@ -117,7 +118,7 @@ namespace fun
 
     unsigned xor_(unsigned x, unsigned y)
     {
-        constexpr n_t n(numbits<decltype(x)>());
+        constexpr n_t n(bitSize_v<decltype(x)>);
 
         unsigned
             ret(0),
@@ -135,54 +136,25 @@ namespace fun
     }
 
 
-    // One liner reading file contents into a string. It's an MSVS hack, as it uses an iterator over an rvalue
-    /*
-    std::string get_file_contents(const char* filepath)
-    {
-        return std::string(std::istreambuf_iterator<char>(std::ifstream(filepath)), {});
-    }
-    */
-
-
     // User defined literal _bits, constructs the minimum capacity bitset for an integer.
     // E.g. 51_bits = std::bitset<6>(0b110011)
-    // Not sure which of the below I like more...
-
-#if __cpp_fold_expressions
-    template<char... S, index_t... N>
-    constexpr unsigned charsToInt_helper(std::index_sequence<N...>)
+    template<char... S, index_t... I>
+    constexpr unsigned long long charsToInt_helper(std::index_sequence<I...>)
     {
-        return (((S - '0') * power(10, sizeof...(N)-1 - N)) + ...);
+        return (((S - '0') * power(10, sizeof...(I)-1 - I)) + ...);
     }
 
     template<char... S>
-    constexpr unsigned charsToInt()
+    constexpr unsigned long long charsToInt()
     {
         return charsToInt_helper<S...>(std::make_index_sequence<sizeof...(S)>());
     }
 
     template<char... S>
-    constexpr auto operator"" _bits() -> std::bitset<numbits(CharsToInt<S...>::value)>
+    constexpr auto operator"" _bits() // -> std::bitset<bitSize(charsToInt<S...>())>
     {
-        return charsToInt<S...>();
+        return std::bitset<bitSize(charsToInt<S...>())>(charsToInt<S...>());
     }
-#else
-    template<char S, char... XS>
-    struct CharsToInt
-        : public std::integral_constant<unsigned, (S - '0') * power(10, sizeof...(XS)) + CharsToInt<XS...>::value>
-    {};
-
-    template<char S>
-    struct CharsToInt<S>
-        : public std::integral_constant<unsigned, S - '0'>
-    {};
-
-    template<char... S>
-    constexpr auto operator"" _bits() -> std::bitset<numbits(CharsToInt<S...>::value)>
-    {
-        return CharsToInt<S...>::value;
-    }
-#endif
 
     void bitsExample()
     {

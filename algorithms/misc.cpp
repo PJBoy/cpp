@@ -15,7 +15,7 @@ float sum_accurate(const float x[], n_t n)
     double r[64]{}; // Double precision cascading accumulators
     
     // Loop to process all the numbers
-    for (index_t i(0); i < n; ++i)
+    for (index_t i{}; i < n; ++i)
     {
         // Remove the sign bit
         float v(std::abs(x[i]));
@@ -38,6 +38,7 @@ float sum_accurate(const float x[], n_t n)
     double sum_double = 0.0;
     for (index_t i(64); i --> 0;)
         sum_double += r[i];
+
     sum_float = float(sum_double);
 
     // Find the exponent of the sum, ready for correction
@@ -132,8 +133,8 @@ template<n_t N, typename... T, index_t... index>
 auto zip_helper(const std::tuple<std::array<T, N>...>& arrays, std::index_sequence<index...>) -> std::array<std::tuple<T...>, N>
 {
     std::array<std::tuple<T...>, N> ret;
-    for (index_t i(0); i < N; ++i)
-        ret[i] = std::make_tuple(std::get<index>(arrays)[i]...);
+    for (index_t i{}; i < N; ++i)
+        ret[i] = std::tuple(std::get<index>(arrays)[i]...);
 
     return ret;
 }
@@ -144,12 +145,18 @@ auto zip(const std::tuple<std::array<T, N>...>& arrays) -> std::array<std::tuple
     return zip_helper(arrays, std::index_sequence_for<T...>());
 }
 
+template<n_t N, typename... T>
+auto zip(const std::array<T, N>&... arrays) -> std::array<std::tuple<T...>, N>
+{
+    return zip(std::tuple(arrays...));
+}
+
 
 template<n_t N, typename... T, index_t... index>
 auto unzip_helper(const std::array<std::tuple<T...>, N>& array, std::index_sequence<index...>) -> std::tuple<std::array<T, N>...>
 {
 	std::tuple<std::array<T, N>...> ret;
-	for (index_t i(0); i < N; ++i)
+	for (index_t i{}; i < N; ++i)
 		std::tie(std::get<index>(ret)[i]...) = std::tie(std::get<index>(array[i])...);
 
 	return ret;
@@ -192,10 +199,12 @@ public:
 	};
 
 private:
-	const index_t i_begin{0}, i_end;
+    const index_t i_begin{}, i_end{};
 	const n_t step{1};
 
 public:
+    Range() = default;
+
 	Range(n_t i_end)
 		: i_end(i_end)
 	{}
@@ -217,7 +226,7 @@ public:
 
 
 // Take forward iterators and demonstrate a double buffering example :)
-void prepend(int* data, n_t n_data, const int header[], n_t n_header)
+void prepend(int data[], n_t n_data, const int header[], n_t n_header)
 {
 /*
     Read block 0 (as it will be overwritten by header)
@@ -234,26 +243,17 @@ void prepend(int* data, n_t n_data, const int header[], n_t n_header)
 
     const n_t n_buffer(10);
     int buffers[2][n_buffer];
-    index_t i_buffers(0);
+    index_t i_buffers{};
 
     const auto read([&](n_t n)
     {
-    /*
-        int(&buffer)[n_buffer](buffers[i_buffers]);
-        std::copy(data_in, data_in + n, std::begin(buffer));
-    /*/
         std::copy(data_in, data_in + n, std::begin(buffers[i_buffers]));
-    //*/
         data_in += n;
     });
+
     const auto write([&](n_t n)
     {
-    /*
-        const int(&buffer)[n_buffer](buffers[i_buffers ^ 1]);
-        std::copy(std::begin(buffer), std::begin(buffer) + n, data_out);
-    /*/
         std::copy(std::begin(buffers[i_buffers ^ 1]), std::begin(buffers[i_buffers ^ 1]) + n, data_out);
-    //*/
         data_out += n;
     });
 
@@ -282,6 +282,13 @@ void prepend(int* data, n_t n_data, const int header[], n_t n_header)
 
 int main()
 {
+    /*
+    std::array a{1, 2, 3};
+    std::array b{1, 4, 9};
+    for (auto [a, b] : zip(a, b))
+        std::cout << a << ", " << b << '\n';
+
+    /*/
 	int data[33];
 	std::iota(std::begin(data), std::end(data), 0);
     int header[7];
@@ -289,5 +296,6 @@ int main()
 
     prepend(data, std::size(data) - std::size(header), header, std::size(header));
     std::cout << data << '\n';
+    //*/
 }
 #endif

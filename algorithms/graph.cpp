@@ -43,14 +43,11 @@ public:
 	};
 
 	Array<Vertex> vertices;
-	index_t i_source;
+    index_t i_source;
 
 	Dijkstra(const Graph& graph, index_t i_source)
-		: i_source(i_source)
+		: vertices(std::begin(graph.vertices), std::end(graph.vertices)), i_source(i_source)
 	{
-		vertices = Array<Vertex>(std::size(graph.vertices));
-		std::copy(std::begin(graph.vertices), std::end(graph.vertices), std::begin(vertices));
-
 		Array<VertexProcessing> verticesProcessing(std::size(vertices));
 		Comparator comparator(verticesProcessing);
 		queue_t queue(comparator);
@@ -71,15 +68,15 @@ public:
 				Vertex& neighbourVertex(vertices[i_neighbourVertex]);
 				VertexProcessing& neighbourVertexProcessing(verticesProcessing[i_neighbourVertex]);
 
-				if (vertexProcessing.distanceFromSource + edge.weight < neighbourVertexProcessing.distanceFromSource)
-				{
-					if (neighbourVertexProcessing.distanceFromSource != VertexProcessing::infinity)
-						queue.erase(neighbourVertexProcessing.it_queue);
+                if (vertexProcessing.distanceFromSource + edge.weight >= neighbourVertexProcessing.distanceFromSource)
+                    continue;
+
+				if (neighbourVertexProcessing.distanceFromSource != VertexProcessing::infinity)
+					queue.erase(neighbourVertexProcessing.it_queue);
 					
-					neighbourVertexProcessing.distanceFromSource = vertexProcessing.distanceFromSource + edge.weight;
-					neighbourVertexProcessing.it_queue = queue.insert(i_neighbourVertex).first;
-					neighbourVertex.i_previousVertex = i_vertex;
-				}
+				neighbourVertexProcessing.distanceFromSource = vertexProcessing.distanceFromSource + edge.weight;
+				neighbourVertexProcessing.it_queue = queue.insert(i_neighbourVertex).first;
+				neighbourVertex.i_previousVertex = i_vertex;
 			}
 		}
 	}

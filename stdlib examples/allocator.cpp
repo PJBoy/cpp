@@ -1,4 +1,5 @@
 #include "../utility/utility.h"
+
 #include <ios>
 #include <iostream>
 #include <sstream>
@@ -7,14 +8,26 @@
 
 struct Indexer
 {
-    static n_t nextId, objectsAlive;
+    inline static n_t nextId, objectsAlive;
 };
-
-n_t Indexer::nextId, Indexer::objectsAlive;
 
 template<typename T>
 class DebugAllocator : protected Indexer
 {
+    template<typename T>
+    friend class DebugAllocator;
+
+public:
+    // Allocator requires this exists
+    using value_type = T;
+
+    using pointer = value_type*;
+
+private:
+    using char_buffer_t = char[sizeof(value_type)];
+
+    index_t id;
+
     static std::string formatPointer(const void* p)
     {
         std::ostringstream s;
@@ -24,7 +37,7 @@ class DebugAllocator : protected Indexer
 
     static std::string formatFunctionName(std::string_view functionName)
     {
-        return "[96m" + std::string(functionName) + "[0m";
+        return "DebugAllocator::[96m" + std::string(functionName) + "[0m";
     }
 
     static std::string indentation()
@@ -34,18 +47,10 @@ class DebugAllocator : protected Indexer
     }
 
 public:
-    // Allocator requires this exists
-    using value_type = T;
-
-    using pointer = value_type*;
-    using size_type = std::make_unsigned_t<typename std::pointer_traits<pointer>::difference_type>;
-
-    index_t id;
-
     DebugAllocator() noexcept
         : id(nextId++)
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ")\n";
         ++objectsAlive;
     }
 
@@ -54,7 +59,7 @@ public:
     DebugAllocator(const DebugAllocator& rhs) noexcept
         : id(nextId++)
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
         ++objectsAlive;
     }
 
@@ -63,7 +68,7 @@ public:
     DebugAllocator(DebugAllocator&& rhs) noexcept
         : id(nextId++)
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
         ++objectsAlive;
     }
 
@@ -73,7 +78,7 @@ public:
     DebugAllocator(const DebugAllocator<T_rhs>& rhs) noexcept
         : id(nextId++)
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
         ++objectsAlive;
     }
 
@@ -83,7 +88,7 @@ public:
     DebugAllocator(DebugAllocator<T_rhs>&& rhs) noexcept
         : id(nextId++)
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
         ++objectsAlive;
     }
 
@@ -92,7 +97,7 @@ public:
     template<typename T_rhs>
     DebugAllocator& operator=(const DebugAllocator<T_rhs>& rhs) noexcept
     {
-        std::cerr << indentation() << id << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << id << " = " << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
     }
 
     // Allocator requires this to construct that object that can deallocate rhs' allocations
@@ -100,13 +105,13 @@ public:
     template<typename T_rhs>
     DebugAllocator& operator=(DebugAllocator<T_rhs>&& rhs) noexcept
     {
-        std::cerr << indentation() << id << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
+        std::cerr << indentation() << id << " = " << formatFunctionName(__func__) << '(' << id << ", move(" << rhs.id << "))\n";
     }
 
     ~DebugAllocator() noexcept
     {
         --objectsAlive;
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ")\n";
     }
 
     // Allocator requires this to be true only if rhs can deallocate memory provided by *this
@@ -115,7 +120,7 @@ public:
     template<typename T_rhs>
     bool operator==(const DebugAllocator<T_rhs>& rhs) const noexcept
     {
-        std::cerr << indentation() << std::boolalpha << true << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << std::boolalpha << true << " = " << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
         return true;
     }
 
@@ -123,49 +128,39 @@ public:
     template<typename T_rhs>
     bool operator!=(const DebugAllocator<T_rhs>& rhs) const noexcept
     {
-        std::cerr << indentation() << std::boolalpha << false << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << std::boolalpha << false << " = " << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
         return false;
     }
 
     // Allocator requires this to allocate memory for n objects of value_type, but to not construct them
-    pointer allocate(size_type n) const
+    pointer allocate(size_t n) const
     {
-        value_type* const p((value_type*) new char[sizeof(value_type) * n]);
-        std::cerr << indentation() << formatPointer(p) << " = DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << n << ")\n";
+        value_type* const p(reinterpret_cast<value_type*>(new char_buffer_t[n]));
+        std::cerr << indentation() << formatPointer(p) << " = " << formatFunctionName(__func__) << '(' << id << ", " << n << ")\n";
         return p;
     }
 
     // Allocator requires this to deallocate memory for (p,n) where p = allocate(n) was previously requested
     // Allocator requires this to not throw
-    void deallocate(pointer p, size_type n) const noexcept
+    void deallocate(pointer p, size_t n) const noexcept
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << formatPointer(p) << ", " << n << ")\n";
-        delete[](value_type*) p;
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ", " << formatPointer(p) << ", " << n << ")\n";
+        delete[] reinterpret_cast<char_buffer_t*>(p);
     }
 
     DebugAllocator select_on_container_copy_construction() const noexcept
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << id << ")\n";
         return {};
     }
 
-    template<typename T_rhs>
-    void swap(DebugAllocator<T_rhs>& rhs) noexcept
+    friend void swap(DebugAllocator& lhs, DebugAllocator& rhs) noexcept
     {
-        std::cerr << indentation() << "DebugAllocator::" << formatFunctionName(__func__) << '(' << id << ", " << rhs.id << ")\n";
+        std::cerr << indentation() << formatFunctionName(__func__) << '(' << lhs.id << ", " << rhs.id << ")\n";
     }
 };
 
-namespace std
-{
-    template<typename T_lhs, typename T_rhs>
-    void swap(DebugAllocator<T_lhs>& lhs, DebugAllocator<T_rhs>& rhs) noexcept
-    {
-        lhs.swap(rhs);
-    }
-}
-
-#if 1
+#if 0
 int main()
 {
     std::vector<int, DebugAllocator<int>> v{3};
@@ -187,7 +182,7 @@ int main()
     decltype(v) v_copy(v);
     std::cout << "Copied\n";
 
-    std::swap(v, v_copy);
+    swap(v, v_copy);
     std::cout << "Swapped\n";
 }
 #endif

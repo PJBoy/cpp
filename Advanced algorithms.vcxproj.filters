@@ -19,6 +19,9 @@
     <Filter Include="Source Files\data structures">
       <UniqueIdentifier>{84eb7131-61bf-4497-8481-90bca1a321ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\stdlib examples">
+      <UniqueIdentifier>{35b99561-8689-4f91-9881-27149a3b4749}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="algorithms\fun.cpp">
@@ -60,23 +63,20 @@
     <ClCompile Include="algorithms\misc.cpp">
       <Filter>Source Files\algorithms</Filter>
     </ClCompile>
-    <ClCompile Include="data structures\misc.cpp">
-      <Filter>Source Files\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="stdlib examples\random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdlib examples\regex.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="stdlib examples\allocator.cpp">
+      <Filter>Source Files\stdlib examples</Filter>
     </ClCompile>
     <ClCompile Include="stdlib examples\iterator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\stdlib examples</Filter>
     </ClCompile>
     <ClCompile Include="stdlib examples\misc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\stdlib examples</Filter>
     </ClCompile>
-    <ClCompile Include="stdlib examples\allocator.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="stdlib examples\random.cpp">
+      <Filter>Source Files\stdlib examples</Filter>
+    </ClCompile>
+    <ClCompile Include="stdlib examples\regex.cpp">
+      <Filter>Source Files\stdlib examples</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utility\utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

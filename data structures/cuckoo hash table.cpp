@@ -5,7 +5,7 @@
 
 class CuckooHashTable
 {
-    struct Entry : public KV
+    struct Entry : public KV<int, int>
     {
         bool useHash2;
 
